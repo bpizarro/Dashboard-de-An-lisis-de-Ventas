@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Validación - TechTrends</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #2563eb; }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
+        .stat-box.error { border-left-color: #ef4444; }
+        .stat-box.success { border-left-color: #10b981; }
+        .stat-label { font-size: 0.9em; color: #6b7280; }
+        .stat-value { font-size: 1.8em; font-weight: bold; color: #1f2937; }
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        .error-list { max-height: 400px; overflow-y: auto; }
+        .error-item {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .file-upload {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            text-align: center;
+            background: #f8fafc;
+        }
+        .file-upload input[type="file"] {
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .warning { color: #f59e0b; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th { background: #f3f4f6; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico de Validación de Datos</h1>
+    
+    <div class="card">
+        <h2>Cargar CSV para Diagnóstico</h2>
+        <div class="file-upload">
+            <input type="file" id="csvFileInput" accept=".csv" />
+            <p style="color: #6b7280; margin-top: 10px;">
+                Selecciona tu archivo CSV para analizar qué datos no pasan la validación
+            </p>
+        </div>
+    </div>
+
+    <div id="output"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/dataProcessor.js"></script>
+    <script>
+        document.getElementById('csvFileInput').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const text = await file.text();
+            runDiagnostics(text);
+        });
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split(/\r?\n/).filter(l => l.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                data.push(row);
+            }
+            return data;
+        }
+
+        function runDiagnostics(csvText) {
+            const rawData = parseCSV(csvText);
+            console.log('📊 Raw data loaded:', rawData.length, 'rows');
+
+            try {
+                const processed = dataProcessor.processData(rawData);
+                const stats = dataProcessor.getCleaningStats();
+                const errors = dataProcessor.getValidationErrors();
+                const summary = dataProcessor.getValidationSummary();
+
+                console.log('✅ Processed:', processed.length, 'valid rows');
+                console.log('📈 Stats:', stats);
+                console.log('❌ Errors:', errors);
+                console.log('📋 Summary:', summary);
+
+                displayResults(stats, summary, errors, rawData);
+            } catch (error) {
+                console.error('💥 Error:', error);
+                document.getElementById('output').innerHTML = `
+                    <div class="card">
+                        <h2 style="color: #ef4444;">❌ Error Crítico</h2>
+                        <p style="color: #ef4444; font-weight: bold;">${error.message}</p>
+                        <pre>${error.stack}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        function displayResults(stats, summary, errors, rawData) {
+            const errorTypes = Object.entries(summary).filter(([k, v]) => v > 0);
+            
+            let html = `
+                <div class="card">
+                    <h2>📊 Resultados del Diagnóstico</h2>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-label">Total de Filas</div>
+                            <div class="stat-value">${stats.totalRows}</div>
+                        </div>
+                        <div class="stat-box success">
+                            <div class="stat-label">✅ Filas Válidas</div>
+                            <div class="stat-value" style="color: #10b981;">${stats.validRows}</div>
+                        </div>
+                        <div class="stat-box error">
+                            <div class="stat-label">❌ Filas Inválidas</div>
+                            <div class="stat-value" style="color: #ef4444;">${stats.invalidRows}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Tasa de Éxito</div>
+                            <div class="stat-value">${((stats.validRows / stats.totalRows) * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (errorTypes.length > 0) {
+                html += `
+                    <div class="card">
+                        <h2>🔍 Resumen de Errores por Tipo</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Error</th>
+                                    <th>Cantidad</th>
+                                    <th>% del Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                const errorLabels = {
+                    idTransaccion: 'ID de Transacción',
+                    fecha: 'Fecha',
+                    idProducto: 'ID de Producto',
+                    nombreProducto: 'Nombre de Producto',
+                    categoria: 'Categoría',
+                    cantidad: 'Cantidad',
+                    precioUnitario: 'Precio Unitario',
+                    totalVenta: 'Total de Venta',
+                    pais: 'País',
+                    metodoPago: 'Método de Pago',
+                    totalConsistencia: 'Consistencia de Totales'
+                };
+
+                errorTypes.forEach(([type, count]) => {
+                    const pct = ((count / stats.invalidRows) * 100).toFixed(1);
+                    html += `
+                        <tr>
+                            <td><strong>${errorLabels[type] || type}</strong></td>
+                            <td>${count}</td>
+                            <td>${pct}%</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (errors.length > 0) {
+                html += `
+                    <div class="card">
+                        <h2>📝 Primeros ${Math.min(10, errors.length)} Errores Detallados</h2>
+                        <div class="error-list">
+                `;
+                
+                errors.slice(0, 10).forEach(err => {
+                    html += `
+                        <div class="error-item">
+                            <strong>Fila ${err.row}:</strong> ${err.error}
+                            <br><small>Datos: ${JSON.stringify(err.data)}</small>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Análisis de columnas del CSV
+            if (rawData.length > 0) {
+                const columns = Object.keys(rawData[0]);
+                const expectedColumns = CONFIG.CSV.REQUIRED_COLUMNS;
+                const missing = expectedColumns.filter(c => !columns.includes(c));
+                const extra = columns.filter(c => !expectedColumns.includes(c));
+
+                html += `
+                    <div class="card">
+                        <h2>📋 Análisis de Estructura del CSV</h2>
+                        <h3>Columnas Encontradas:</h3>
+                        <pre>${JSON.stringify(columns, null, 2)}</pre>
+                        ${missing.length > 0 ? `<p class="warning">⚠️ <strong>Columnas Faltantes:</strong> ${missing.join(', ')}</p>` : ''}
+                        ${extra.length > 0 ? `<p style="color: #6b7280;">ℹ️ Columnas Extra: ${extra.join(', ')}</p>` : ''}
+                    </div>
+                `;
+            }
+
+            document.getElementById('output').innerHTML = html;
+        }
+
+        // Auto-detectar si hay test_sample.csv cargado
+        fetch('test_sample.csv')
+            .then(r => r.text())
+            .then(text => {
+                console.log('📂 test_sample.csv detectado, ejecutando diagnóstico automático...');
+                runDiagnostics(text);
+            })
+            .catch(() => console.log('ℹ️ No se encontró test_sample.csv - carga un archivo manualmente'));
+    </script>
+</body>
+</html>

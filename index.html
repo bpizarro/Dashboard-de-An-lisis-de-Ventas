@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechTrends - Dashboard de Ventas</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>TechTrends</h1>
+                </div>
+                <p class="subtitle">Dashboard de Análisis de Ventas</p>
+            </div>
+        </div>
+    </header>
+    
+    
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- File Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h2>Cargar Datos de Ventas</h2>
+                    <p>Selecciona un archivo CSV con los datos de ventas para comenzar el análisis</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="csvFile" accept=".csv" class="file-input">
+                        <label for="csvFile" class="file-input-label">
+                            <i class="fas fa-file-csv"></i>
+                            Seleccionar archivo CSV
+                        </label>
+                    </div>
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <span class="file-name" id="fileName"></span>
+                        <span class="file-size" id="fileSize"></span>
+                    </div>
+                </div>
+
+            <!-- Error Message -->
+            <div class="error-container" id="errorContainer" style="display: none;">
+                <div class="error-message" role="alert" aria-live="polite">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="errorMessage"></span>
+                    <button class="error-close" id="errorClose" type="button" aria-label="Cerrar mensaje de error">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content" id="dashboardContent" style="display: none;">
+                <!-- KPIs Section -->
+                <section class="kpis-section">
+                    <h2 class="section-title">Métricas Principales</h2>
+                    <div class="kpis-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-title">Ventas Totales</h3>
+                                <p class="kpi-value" id="totalSales">$0</p>
+                                <p class="kpi-subtitle">Ingresos generados</p>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-title">Transacciones</h3>
+                                <p class="kpi-value" id="totalTransactions">0</p>
+                                <p class="kpi-subtitle">Total de ventas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-title">Ticket Promedio</h3>
+                                <p class="kpi-value" id="averageTicket">$0</p>
+                                <p class="kpi-subtitle">Por transacción</p>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-title">Productos Vendidos</h3>
+                                <p class="kpi-value" id="totalProducts">0</p>
+                                <p class="kpi-subtitle">Unidades totales</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Filters Section -->
+                <section class="filters-section">
+                    <h2 class="section-title">Filtros</h2>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="dateFrom" class="filter-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Fecha Desde
+                            </label>
+                            <input type="date" id="dateFrom" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="dateTo" class="filter-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Fecha Hasta
+                            </label>
+                            <input type="date" id="dateTo" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="productFilter" class="filter-label">
+                                <i class="fas fa-box"></i>
+                                Producto
+                            </label>
+                            <select id="productFilter" class="filter-select">
+                                <option value="">Todos los productos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="countryFilter" class="filter-label">
+                                <i class="fas fa-globe"></i>
+                                País
+                            </label>
+                            <select id="countryFilter" class="filter-select">
+                                <option value="">Todos los países</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="categoryFilter" class="filter-label">
+                                <i class="fas fa-tags"></i>
+                                Categoría
+                            </label>
+                            <select id="categoryFilter" class="filter-select">
+                                <option value="">Todas las categorías</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <button class="filter-button reset" id="resetFilters">
+                                <i class="fas fa-undo"></i>
+                                Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <h2 class="section-title">Visualizaciones</h2>
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">
+                                    <i class="fas fa-chart-line"></i>
+                                    Ventas Mensuales
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Top 5 Productos
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="productsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">
+                                    <i class="fas fa-chart-pie"></i>
+                                    Métodos de Pago
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="paymentChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">
+                                    <i class="fas fa-globe"></i>
+                                    Ventas por País
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="countryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Table Section -->
+                <section class="table-section">
+                    <div class="table-header">
+                        <h2 class="section-title">Datos Detallados</h2>
+                        <div class="table-controls">
+                            <input type="text" id="searchInput" placeholder="Buscar..." class="search-input">
+                            <select id="rowsPerPage" class="rows-select">
+                                <option value="10">10 filas</option>
+                                <option value="25">25 filas</option>
+                                <option value="50">50 filas</option>
+                                <option value="100">100 filas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="dataTable" aria-label="Tabla de datos de ventas">
+                            <caption class="visually-hidden">Transacciones de ventas detalladas</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Categoría</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Precio</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">País</th>
+                                    <th scope="col">Método Pago</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-pagination" id="tablePagination">
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 TechTrends. Dashboard de Análisis de Ventas.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/dataLoader.js"></script>
+    <script src="js/dataProcessor.js"></script>
+    <script src="js/metrics.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

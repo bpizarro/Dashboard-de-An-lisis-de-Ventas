@@ -1,0 +1,597 @@
+/* ===========================================
+   TechTrends Dashboard - Estilos de Componentes
+   
+   GUÍA RÁPIDA:
+   Este archivo contiene los estilos de todos los componentes específicos
+   de la aplicación (tarjetas KPI, filtros, gráficos, tablas, paginación).
+   
+   Cada componente tiene:
+   - Estilos base (apariencia normal)
+   - Estados hover/focus (interacción del usuario)
+   - Variaciones (::before, ::after para decoración)
+   - Responsive (adaptación a móviles)
+   
+   GLOSARIO:
+   - KPI: Key Performance Indicator (indicador clave), número importante del negocio
+   - Hover: Estado cuando el mouse pasa por encima de un elemento
+   - ::before / ::after: Pseudo-elementos que añaden contenido decorativo sin HTML
+   - nth-child(n): Selector que elige el elemento hijo número n
+   - translateY: Movimiento vertical (animación)
+   - backdrop-filter: Filtro visual que afecta lo que está detrás del elemento
+   - overflow: hidden: Oculta contenido que sale de los bordes
+   - transform: Transforma visualmente un elemento (mover, rotar, escalar)
+   =========================================== */
+
+/* KPI Cards - Tarjetas que muestran indicadores clave del negocio */
+.kpi-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-6);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-normal); /* Anima todos los cambios suavemente */
+    position: relative; /* Necesario para posicionar el ::before */
+    overflow: hidden; /* Oculta contenido que sale de los bordes */
+}
+
+.kpi-card::before {
+    /* Línea de color en la parte superior de cada tarjeta */
+    content: ''; /* Pseudo-elemento vacío, solo decorativo */
+    position: absolute; /* Se posiciona respecto a .kpi-card */
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px; /* Línea delgada */
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.kpi-card:hover {
+    /* Efecto al pasar el mouse: sube ligeramente */
+    transform: translateY(-2px); /* Mueve hacia arriba 2 píxeles */
+    box-shadow: var(--shadow-lg); /* Sombra más grande = más profundidad */
+}
+
+/* Cada tarjeta tiene un color diferente en su línea superior */
+.kpi-card:nth-child(1)::before {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+}
+
+.kpi-card:nth-child(2)::before {
+    background: linear-gradient(90deg, var(--success-color), #34d399);
+}
+
+.kpi-card:nth-child(3)::before {
+    background: linear-gradient(90deg, var(--warning-color), #fbbf24);
+}
+
+.kpi-card:nth-child(4)::before {
+    background: linear-gradient(90deg, var(--accent-color), #22d3ee);
+}
+
+.kpi-card-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.kpi-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xl);
+    color: var(--white);
+    flex-shrink: 0;
+}
+
+.kpi-card:nth-child(1) .kpi-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+}
+
+.kpi-card:nth-child(2) .kpi-icon {
+    background: linear-gradient(135deg, var(--success-color), #34d399);
+}
+
+.kpi-card:nth-child(3) .kpi-icon {
+    background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+}
+
+.kpi-card:nth-child(4) .kpi-icon {
+    background: linear-gradient(135deg, var(--accent-color), #22d3ee);
+}
+
+.kpi-content {
+    flex: 1;
+}
+
+.kpi-title {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.kpi-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-1);
+    line-height: 1.2;
+}
+
+.kpi-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    font-weight: 400;
+}
+
+/* Filter Components - Controles para filtrar los datos mostrados */
+.filter-group {
+    display: flex;
+    flex-direction: column; /* Apila elementos verticalmente */
+    gap: var(--spacing-2); /* Espacio entre label e input */
+}
+
+.filter-label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2); /* Espacio entre icono y texto */
+}
+
+.filter-label i {
+    color: var(--primary-color); /* Icono en color primario */
+    font-size: var(--font-size-sm);
+}
+
+.filter-input,
+.filter-select {
+    /* Estilos compartidos para inputs de texto y selectores */
+    padding: var(--spacing-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    background: var(--white);
+    transition: all var(--transition-fast);
+    font-family: inherit; /* Hereda la fuente del padre */
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    /* Estado cuando el usuario hace clic en el campo */
+    outline: none; /* Quita el borde azul por defecto del navegador */
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* Resplandor suave azul */
+}
+
+.filter-input:hover,
+.filter-select:hover {
+    /* Efecto al pasar el mouse */
+    border-color: var(--gray-400);
+}
+
+.filter-button {
+    /* Botones de acción (Aplicar filtros, Limpiar) */
+    padding: var(--spacing-3) var(--spacing-4);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2); /* Espacio entre icono y texto */
+    font-family: inherit;
+}
+
+.filter-button.reset {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.filter-button.reset:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-400);
+}
+
+.filter-button.apply {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.filter-button.apply:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Chart Cards - Tarjetas que contienen gráficos de Chart.js */
+.chart-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden; /* Evita que el contenido salga de la tarjeta redondeada */
+    transition: all var(--transition-normal);
+}
+
+.chart-card:hover {
+    box-shadow: var(--shadow-lg); /* Sombra más grande al pasar el mouse */
+}
+
+.chart-header {
+    /* Encabezado con el título del gráfico */
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid var(--gray-200); /* Línea separadora */
+    background: var(--gray-50); /* Fondo ligeramente gris */
+}
+
+.chart-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin: 0;
+}
+
+.chart-title i {
+    color: var(--primary-color);
+    font-size: var(--font-size-base);
+}
+
+.chart-container {
+    padding: var(--spacing-6);
+    position: relative;
+    height: 300px;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Loading States */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+/* Loading States - Estados de carga con animación de spinner */
+.loading-overlay {
+    /* Capa que cubre toda la sección mientras carga */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9); /* Blanco semi-transparente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10; /* Por encima del contenido */
+    border-radius: var(--radius-xl);
+}
+
+.loading-overlay i {
+    /* Icono de carga (spinner) */
+    font-size: var(--font-size-2xl);
+    color: var(--primary-color);
+    animation: spin 1s linear infinite; /* Gira continuamente */
+}
+
+@keyframes spin {
+    /* Define la animación de rotación */
+    from {
+        transform: rotate(0deg); /* Comienza sin rotar */
+    }
+    to {
+        transform: rotate(360deg); /* Termina con rotación completa */
+    }
+}
+
+/* Data Table Enhancements */
+.data-table {
+    font-size: var(--font-size-sm);
+}
+
+.data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--gray-100);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: var(--font-size-xs);
+/* Data Table Enhancements - Mejoras visuales para las tablas de datos */
+.data-table tbody tr {
+    transition: background-color var(--transition-fast); /* Transición suave de color */
+}
+
+.data-table tbody tr:hover {
+    /* Resalta la fila al pasar el mouse */
+    background: var(--gray-50);
+}
+
+.data-table tbody tr:nth-child(even) {
+    /* Filas pares con fondo alternado (efecto cebra) */
+    background: var(--gray-25);
+}
+
+/* Pagination - Controles de paginación (anterior/siguiente, números de página) */
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2); /* Espacio entre botones */
+}
+
+.pagination-button {
+    /* Botones individuales de la paginación */
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    color: var(--gray-700);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-sm);
+    min-width: 40px; /* Ancho mínimo para que sean cuadrados */
+    text-align: center;
+}
+
+.pagination-button:hover:not(:disabled) {
+    /* Efecto hover solo si no está deshabilitado */
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.pagination-button:disabled {
+    /* Botón deshabilitado (ej: "Anterior" en la primera página) */
+    opacity: 0.5;
+    cursor: not-allowed; /* Cursor de "no permitido" */
+}
+
+.pagination-button.active {
+    /* Página actual */
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.pagination-info {
+    /* Texto informativo (ej: "Mostrando 1-10 de 50") */
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin: 0 var(--spacing-4);
+}
+
+/* Tooltips - Información emergente al pasar el mouse */
+.tooltip {
+    position: relative; /* Necesario para posicionar el tooltip */
+    cursor: help; /* Cursor de ayuda (?) */
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-900);
+    color: var(--white);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+    z-index: 1000;
+    margin-bottom: var(--spacing-2);
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--gray-900);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+    z-index: 1000;
+    margin-bottom: -4px;
+}
+
+.tooltip:hover::after,
+.tooltip:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Status Indicators - Indicadores de estado con colores (éxito, advertencia, error) */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.status-indicator.success {
+    /* Estado exitoso (verde) */
+    background: rgba(16, 185, 129, 0.1); /* Verde semi-transparente */
+    color: var(--success-color);
+}
+
+.status-indicator.warning {
+    /* Advertencia (amarillo/naranja) */
+    background: rgba(245, 158, 11, 0.1); /* Amarillo semi-transparente */
+    color: var(--warning-color);
+}
+
+.status-indicator.error {
+    /* Error (rojo) */
+    background: rgba(239, 68, 68, 0.1); /* Rojo semi-transparente */
+    color: var(--error-color);
+}
+
+.status-indicator.info {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+}
+
+/* Badges - Etiquetas pequeñas para categorizar o marcar elementos */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: uppercase; /* Texto en mayúsculas */
+    letter-spacing: 0.05em; /* Espaciado entre letras */
+}
+
+.badge.primary {
+    /* Badge azul (primario) */
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+}
+
+.badge.secondary {
+    /* Badge gris (secundario) */
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--secondary-color);
+}
+
+.badge.success {
+    /* Badge verde (éxito) */
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.badge.warning {
+    /* Badge amarillo (advertencia) */
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+}
+
+.badge.error {
+    /* Badge rojo (error) */
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error-color);
+}
+
+/* Progress Bars - Barras de progreso para visualizar porcentajes */
+.progress-bar {
+    width: 100%;
+    height: 8px; /* Barra delgada */
+    background: var(--gray-200);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-normal);
+}
+
+/* Responsive Components */
+@media (max-width: 768px) {
+    .kpi-card {
+        padding: var(--spacing-4);
+    }
+    
+    .kpi-card-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-3);
+    }
+    
+    .kpi-icon {
+        width: 50px;
+        height: 50px;
+        font-size: var(--font-size-lg);
+    }
+    
+    .kpi-value {
+        font-size: var(--font-size-xl);
+    }
+    
+    .chart-container {
+        padding: var(--spacing-4);
+        height: 250px;
+    }
+    
+    .chart-header {
+        padding: var(--spacing-3) var(--spacing-4);
+    }
+    
+    .chart-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .filter-group {
+        margin-bottom: var(--spacing-3);
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pagination-info {
+        margin: var(--spacing-2) 0;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-card {
+        padding: var(--spacing-3);
+    }
+    
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+    }
+    
+    .kpi-value {
+        font-size: var(--font-size-lg);
+    }
+    
+    .chart-container {
+        padding: var(--spacing-3);
+        height: 200px;
+    }
+    
+    .data-table {
+        font-size: var(--font-size-xs);
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: var(--spacing-2);
+    }
+}}}
